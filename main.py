@@ -15,7 +15,7 @@
 # "upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Flag_of_Australia.svg/50px-Flag_of_Australia.svg.png"},]
 #
 # 4..  Создайте функцию, которая будет выводить словарь с данными конкретной страны по её короткому имени.
-
+import re
 
 from bs4 import BeautifulSoup
 import requests
@@ -35,10 +35,10 @@ def country_parser():
     for row in rows:
         country_data = {}
 
-        # TODO same_letter_count
-
         try:
-            country = row.findAll('td')[2].find('a').get('title')
+            country = row.findAll('td')[2].text  # find('a').get('title')
+        except UnboundLocalError:
+            country = None
         except IndexError:
             country = None
 
@@ -63,16 +63,33 @@ def country_parser():
 
         countries_data.append(country_data)
 
-    print(countries_data)
-
     return countries_data
 
 
+def get_same_letter_count(countries, country):
+    first_str = country[0]
+    same_letter = 0
+    for country in countries:
+        try:
+            if country['country'][0] == first_str:
+                same_letter = same_letter + 1
+        except TypeError:
+            same_letter = 0
+    return same_letter
+
+
 def get_country_data(country):
-    pass
+    countries_data = country_parser()
+    same_letter_count = get_same_letter_count(countries_data, country)
+    search_country = None
+
+    for country_data in countries_data:
+        if country_data['country'] == country + '\n':
+            country_data['same_letter_count'] = same_letter_count
+            search_country = country_data
+
+    return print(search_country)
 
 
 if __name__ == '__main__':
-    country_parser()
-
-    # get_country_data('Ukraine')
+    get_country_data('Украина')
