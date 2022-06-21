@@ -69,6 +69,17 @@ def get_same_letter_count(countries, country):
     return same_letter
 
 
+def clean_data(country_data):
+
+    for key, value in country_data.items():
+        try:
+            country_data[key] = value.replace('\n', '')
+        except AttributeError:
+            country_data[key] = value
+
+    return country_data
+
+
 def get_country_data(country):
     countries_data = country_parser()
     same_letter_count = get_same_letter_count(countries_data, country)
@@ -78,6 +89,12 @@ def get_country_data(country):
         if country_data['country'] == country + '\n':
             country_data['same_letter_count'] = same_letter_count
             search_country = country_data
+
+    # before clean data : search_country {'country': 'country\n', 'full_country_name': 'full_country_name\n' ... }
+
+    clean_data(search_country)
+
+    # after clean data : search_country {'country': 'country', 'full_country_name': 'full_country_name' ... }
 
     return print(search_country)
 
